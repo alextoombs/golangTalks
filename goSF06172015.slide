@@ -1,0 +1,67 @@
+Authentication: Trusting 3rd Party Identity Providers
+
+Alex Toombs
+Software Engineer, Apcera
+alex@apcera.com
+@alextoombs
+See you at Gophercon!
+
+* Who am I?
+
+- Golang specialist (i.e. lazy)
+- Platform Lead at Apcera (~2 years)
+- Work in container-space a lot (consume Docker/ACI)
+- Moonlight on authentication/authorization
+
+* About Apcera
+
+- Develop a platform for enterprises to manage applications & services
+- Identity & identity-based access is built-in and at the forefront
+
+* Authentication to Apcera
+
+* Overview
+
+- Users target cluster and log in via an authentication provider
+- If the authentication provider gives the thumbs up, user gets a token
+- We use JWTs (JSON Web Token) as our token format
+- JWTs hold claims, against which we can make assertions
+- Claims include: who you are, and who said you are who you are
+
+* Claims and Policy
+
+- Policy is how we control who can do what
+
+    service::/prod {
+        if (Google->email == "alex@apcera.com") {
+            permit bind
+        }
+    }
+
+- Input claims are stored on the JWT
+- Allow us to write policy against identity
+
+* What is Identity?
+
+- Identity is an assertion about who you are
+- Can be used for authentication/authorization (we do both)
+
+* Who asserts an Identity?
+
+- Common examples: Google, Twitter, Github, Facebook, Amazon, Active Directory
+- Generally, some upstream provider
+
+* Identity Services
+
+* Consuming Identity
+
+- In our case, the consumer of identity is our authentication server
+- Authentication server is configured to talk to some provider (i.e. with AD keytab, Google client ID)
+- Clients of our clusters authenticate with service of their choice out of band (i.e. kinit, Google device login)
+- Based upon user input and configuration, auth server grants a token to access cluster
+
+* Why don't we provide Identity?
+
+- Identity is hard
+- Identity implies storing secrets somewhere
+- Talking to somebody else that stores the passwords/secrets
