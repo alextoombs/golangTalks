@@ -1,0 +1,245 @@
+Authentication: Trusting 3rd Party Identity Providers
+
+17 June 2015
+
+Alex Toombs
+Software Engineer, Apcera
+alex@apcera.com
+@alextoombs
+See you at Gophercon & Dockercon!
+Meetup at Apcera: June 23rd, post Dockercon (Kubernetes PM Eric Han)
+
+* Who am I?
+
+- Golang dev (learned it first, now spoiled)
+- Platform Lead at Apcera (~2 years)
+- Work in container-space a lot (consume Docker/ACI)
+- Moonlight on authentication/authorization
+
+* About Apcera
+
+- Develop a platform for enterprises to manage applications & services
+- Identity & identity-based access is built-in and at the forefront
+- Golang users! (>90% Go code in our main repo, since ~ August 2012)
+
+.image apceraLogo.png _ 1000
+
+* Authentication to Apcera
+
+* Overview
+
+- Users sign in to a cluster and log in via an authentication provider
+- If the authentication provider gives the thumbs up, user gets a token
+- We use JWTs (JSON Web Token) as our token format
+- JWTs hold claims, against which we can make assertions
+- Claims include: who you are, and who said you are who you are
+
+* Claims and Policy
+
+- Policy is how we control who can do what
+
+    service::/prod {
+        if (Google->email == "alex@apcera.com") {
+            permit bind
+        }
+    }
+
+- Input claims are stored on the JWT
+- Allow us to write policy against identity
+
+* What is Identity?
+
+- Identity is an assertion about who you are / what you are
+- Can be used for authentication/authorization (we do both)
+
+* Who asserts an Identity?
+
+- Common examples: Google, Twitter, Github, Facebook, Amazon, Active Directory
+- Generally, some upstream provider
+
+    $ apc login --google
+
+    Connecting to $CLUSTER...
+
+    Sign in with Google:
+
+    1. Browse to: https://www.google.com/device
+    2. Enter this code: DEAD-BEEF
+    3. Grant access to Continuum.
+
+    Did you successfully authorize Continuum? [y/N]:
+
+* Who asserts an Identity?
+
+.image googleDevice.png _ 1000
+
+* Identity Services
+
+* Consuming Identity
+
+- In our case, the consumer of identity is our authentication server
+- Authentication server is configured to talk to some provider (i.e. with AD keytab, Google client ID)
+- Clients of our clusters authenticate with service of their choice out of band (i.e. kinit, Google device login)
+- Based upon user input and configuration, auth server grants a token to access cluster
+- Similar experience/flow for identity providers
+
+* Why don't we provide Identity?
+
+- Identity is hard
+- Harder than just using some API, for sure!
+- Identity implies storing secrets somewhere
+- We chose to talk to somebody else that stores the passwords/secrets & manages identity
+- Yet another password?
+
+* Why don't we provide Identity?
+
+- Decreases the problem space: even if we see some credentials, we see them for just a little bit
+- We don't want to end up on https://isleaked.com/
+- Target customers already have their own identity stores; they don’t want another one to manage (more passwords!)
+- Worse: people reuse passwords often; especially dangerous with enterprise users
+
+* Google
+
+* How do we consume Identity?
+
+- Google: OAuth2 installed app flow
+
+.image googleWebFlow.png _ 350
+
+From: https://developers.google.com/identity/protocols/OAuth2InstalledApp
+
+* How do we consume Identity?
+
+- Google result: user is authenticated with a separate bearer token (JWT!) and refresh token
+- Bearer token is short lived and granted by our auth server
+- Refresh token is long-lived; used to get a new bearer token
+- Clients cache both, and respond to OAuth2-spec error codes (e.g. invalid_grant, etc)
+
+* Kerberos
+
+* How do we consume Identity?
+
+- Enterprise users -> Active Directory
+- Active Directory: basically, LDAP + Kerberos
+- Kerberos: on multiple platforms
+- Corp. machines configured to kinit upon login (behind the scenes)
+- Kerberos: over 30 years old (!)
+- Modern standard: Kerberos v5, but fragmented (AD Kerberos vs Heimdal vs MIT, etc...)
+- Kerberos is not the most exciting protocol, but being able to do what we did is powerful-- Go is awesome
+
+* Kerberos
+
+- Somewhere, a Kerberos Key Distribution Center (KDC) knows your username & auth details (e.g. password, SmartCard)
+- Users `kinit` at the command line with username and password; `krb5.conf` points to KDC
+- KDC gives a ticket granting ticket (TGT) to the client, which is proof of authentication
+- Clients can use TGT with KDC to get service-specific tickets
+- Service tickets are issued granting client app access to Kerberized service
+
+* Kerberos
+
+    $ klist
+    Ticket cache: FILE:/tmp/krb5cc_501
+    Default principal: myname@REALM
+
+    Valid starting       Expires              Service principal
+    06/16/2015 00:06:00  06/16/2015 10:06:00  krbtgt/REALM
+	    renew until 06/17/2015 00:04:59
+    06/16/2015 00:06:13  06/16/2015 10:06:00  HTTP/spn@REALM
+	    renew until 06/17/2015 00:04:59
+
+* Kerberos
+
+.image Kerberos.png _ 500
+
+"Kerberos" by Daniel Sonck - Own work. Licensed under CC BY-SA 3.0 via Wikimedia Commons - https://commons.wikimedia.org/wiki/File:Kerberos.svg#/media/File:Kerberos.svg
+
+* Consuming Kerberos
+
+- Kerberos is remarkably hard to work with, as a "standard"
+- In comes: GSSAPI (Generic Security Services Application Programming Interface)
+- GSSAPI: "an application programming interface for programs to access security services", according to Wiki
+- Generic enough?
+
+* GSSAPI
+
+- Goal: generic authentication layer, used for more than just Kerberos
+- Reality: mostly used for Kerberos
+- GSSAPI exists because it's stable, and Kerberos isn't fun to implement yourself
+- GSSAPI-land: service tickets become "security contexts"; keytabs become "credentials"
+- GSSAPI: for interoperation
+- GSSAPI is an ABI, with language bindings for multiple languages like C; not an HTTP API
+
+* GSSAPI flow for HTTP: SPNEGO
+
+1. Service-side: acquire credential (keytab)
+
+2. Client initiates security context, and requests to authenticate (HTTP) with 'Authorization' header
+
+3. Server responds with a challenge: HTTP 401, 'WWW-Authenticate' header
+
+4. Client responds again, with 'Authorization' header and service ticket payload
+
+5. Server accepts security context using credential, then returns access token
+
+Refresh happens automatically, with valid service tickets
+
+* GSSAPI flow for HTTP: server
+
+.code spnego_server.go /Negotiate handles the SPNEGO client-server/,/fin/
+
+* GSSAPI flow for HTTP
+
+- Browsers are all compatible, although only Safari and IE out of the box
+- Rest require some config
+- Some clients use SPNEGO to negotiate auth details
+
+* GSSAPI
+
+- GSSAPI should provide interoperability that we need: code sharing between our CLI app and our authentication server (both Golang)
+- Multiple GSSAPI libraries installed
+- Both CLI client and `kinit` binary should load the same GSSAPI library; mismatches mean authentication fails
+
+* GSSAPI: challenges
+
+- Enter: dynamic linking, of C code into Golang
+- ~35 year old standard vs ~6 year old language... works well!
+- dlopen of the provided library
+- Spoiled: need to manage own memory (free objects)
+- Not good to pass Golang objects into C code, even via unsafe package, so we copy everything back and forth
+- Errors: major/minor status converted to Golang errors
+- Calling into C code: not protected from buffer overflows
+
+* apcera/gssapi
+
+- To test: bring up your own client, server, and KDC
+- Component test can be run, Docker-ized: (assuming running Docker)
+
+	cd $GOPATH/src/github.com/apcera/gssapi/test
+
+    GOROOT=/usr/local/go ./run-heimdal.sh
+
+* Check it out!
+
+- Just open sourced our library Monday night! (6/15/2015)
+- We use it ourselves
+- Big thanks to Lev Brouk and Phil Pennock
+- If you have to do this, too, let us save you some time:
+
+.link https://github.com/apcera/gssapi
+
+
+* GSSAPI: threading
+
+- Definitely has threading issues; best used single-threaded for now
+- We're wrapping an ABI
+- We don't know what's going on inside
+- Not reentrant
+- Library shares some info like last error status (for CONTINUE_NEEDED)
+- ^ probably a mistake we'll revisit; stopgap solution
+
+* GSSAPI next steps
+
+- Next steps: our APIs are too C-conforming; we'd like a Golang-idiomatic convenience wrapper
+- Keep C-like API (shown earlier)
+- Add idiomatic wrapper
+- Result: less crazy function/method signatures
