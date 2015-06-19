@@ -185,7 +185,7 @@ Refresh happens automatically, with valid service tickets
 
 * GSSAPI flow for HTTP: server
 
-.code spnego_server.go /Negotiate handles the SPNEGO client-server/,/fin/
+.code spnego_server /Negotiate handles the SPNEGO client-server/,/fin/
 
 * GSSAPI flow for HTTP
 
