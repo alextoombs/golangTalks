@@ -1,0 +1,156 @@
+Docker + App Container -> OCP
+
+23 June 2015
+
+Alex Toombs
+Software Engineer, Apcera
+alex@apcera.com
+@alextoombs
+See you at Gophercon!
+
+* Who am I?
+
+- @ Apcera > 2 years
+- Platform Lead
+- Deployment, packaging, auditability
+- Not only microservice-based apps: legacy stacks, too
+- (...but not the focus today)
+
+* About Apcera
+
+- Develop a platform for enterprises to manage applications & services
+- Golang users! (>90% Go code in our main repo, since ~ August 2012)
+- Wrote our own container implementation (using common techs like cgroups, namespaces)
+- Digest Docker/ACI/whatever images to run (polyglot stacks welcome)
+
+.image apceraLogo.png _ 1000
+
+* Hosted Slides
+
+http://present.croissant.buffalo.im/apceraMeetup/apceraMeetup.slide#1
+
+(on Continuum)
+
+* Docker vs CoreOS
+
+* Docker vs CoreOS
+
+.image Olive_branch.png _ 750
+
+By Evrik and Mets501 [Public domain], via Wikimedia Commons
+
+* Docker vs CoreOS
+
+Just kidding! We're all friends now
+
+* Original title: killed by shykes!
+
+- Awesome announcement yesterday: OCP!
+- Open Container Project (under the Linux Foundation)
+- First reference implementation: runC
+- Apcera's down with OCP!
+- Lots of big backers (Docker, Amazon, Google, Microsoft, CoreOS, etc.)
+
+* Docker
+
+* Docker: past
+
+- History: dotCloud's Docker project started in ~ early 2013
+- dotCloud has been around ~8 years; struck a chord with Docker
+- Docker: uickly became synonymous with containers
+
+* Docker: past
+
+- `docker/docker` repo, v0.1.0: https://github.com/docker/docker/releases/tag/v0.1.0
+- March 23, 2013
+- 527 commits
+- dotCloud -> Docker
+- LXC (Linux Containers)
+
+* Docker: past
+
+- `docker/docker` repo, v0.9.0: https://github.com/docker/docker/releases/tag/v0.9.0
+- March 10, 2014
+- 6739 commits
+- "Add the pure Go libcontainer library to make it possible to run containers..."
+- "Add native exec driver which uses libcontainer and make it the default exec driver."
+- LXC -> libcontainer
+
+* Docker: present
+
+- 500,000,000 containers downloaded (according to Dockercon)
+- 16,339 commits (post-lunch, today)
+- Many products: Engine, Compose, Swarm, Machine, Notary, etc.
+- Plugins are powerful
+- OCP! (more later)
+
+* Docker: future
+
+- Microkernels (just kidding)
+- Heavy focus on trust around containers (big criticism)
+- Support more platforms (e.g. Microsoft for Windows Server)
+- libcontainer -> runC?
+
+* appc
+
+* appc: origins
+
+- CoreOS started appc project to define a spec for containers
+- Trust at the core; use common tools like pgp/tar/shasum for image verification/portability
+- Independent from CoreOS, maintained by 6 people (up until recently!)
+- rkt: reference implementation
+
+* appc: tenets
+
+- Composable
+- Secure
+- Decentralized (!)
+- Open
+
+* appc: pieces
+
+- App Container Image: what image is run
+- App Container Image Discovery: how to find images
+- App Container Pod: what a deployable, executable unit is
+- App Container Executor: how pods are executed
+
+* appc + Apcera: Kurma
+
+- Apcera question: what to do with container runtimes?
+- libcontainer vs rkt vs our own tech vs something else...
+- Spec was attractive; well-defined interface
+- DNS discovery protocol: awesome!
+- Decentralized distribution vs centralized registry
+
+* Future: Open Container Project (OCP)
+
+* OCP
+
+.image ocp.png _ 750
+
+(http://opencontainers.org/)
+
+* OCP
+
+- Reference implementation: https://github.com/opencontainers/runc
+- Heavily libcontainer flavored
+- No image spec yet (adopting from appc?)
+- Highly in flux! (just over a day old, publicly)
+- Spec: emphasis on "working code" for moving spec forward
+
+* OCP: open questions
+
+- Image spec: what will that look like? (ACI, we hope)
+- Registry v2: pertains to above
+- Future of rkt
+- Future of libcontainer
+- Security scanning of images (mentioned briefly yesterday)
+
+* OCP + Apcera: ?
+
+- Committed to improving the spec
+- Provide feedback/PRs
+- Very interested in image verification (notary is cool, but independent)
+- Policy for allowed sets of keys, maybe?
+- Doesn't replace Docker; Docker has the distribution down
+
