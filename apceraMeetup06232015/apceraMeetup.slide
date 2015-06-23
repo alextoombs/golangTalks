@@ -57,7 +57,7 @@ Just kidding! We're all friends now
 
 - History: dotCloud's Docker project started in ~ early 2013
 - dotCloud has been around ~8 years; struck a chord with Docker
-- Docker: uickly became synonymous with containers
+- Docker: quickly became synonymous with containers
 
 * Docker: past
 
@@ -87,8 +87,8 @@ Just kidding! We're all friends now
 * Docker: future
 
 - Microkernels (just kidding)
-- Heavy focus on trust around containers (big criticism)
-- Support more platforms (e.g. Microsoft for Windows Server)
+- Heavy focus on trust around containers (big criticism; tarsums, signatures, etc)
+- Support more platforms (e.g. Microsoft, for Windows Server)
 - libcontainer -> runC?
 
 * appc
