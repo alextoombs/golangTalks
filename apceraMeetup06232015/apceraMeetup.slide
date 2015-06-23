@@ -21,7 +21,7 @@ See you at Gophercon!
 - Develop a platform for enterprises to manage applications & services
 - Golang users! (>90% Go code in our main repo, since ~ August 2012)
 - Wrote our own container implementation (using common techs like cgroups, namespaces)
-- Digest Docker/ACI/whatever images to run (polyglot)
+- Digest Docker/ACI/whatever images to run (polyglot stacks welcome)
 
 .image apceraLogo.png _ 1000
 
@@ -29,10 +29,13 @@ See you at Gophercon!
 
 * Docker vs CoreOS
 
-// TODO: insert olive branch picture from shykes' talk
-.image oliveBranch.png _ 1000
+.image Olive_branch.png _ 750
 
-Just kidding!
+By Evrik and Mets501 [Public domain], via Wikimedia Commons
+
+* Docker vs CoreOS
+
+Just kidding! We're all friends now
 
 * Original title: killed by shykes!
 
@@ -40,38 +43,84 @@ Just kidding!
 - Open Container Project (under the Linux Foundation)
 - First reference impl: runC
 - Apcera's down with OCP!
-- Best of libcontainer, appc, etc.
+- Lots of big backers (Docker, Amazon, Google, Microsoft, CoreOS, etc.)
 
 * Docker
 
-* Docker Engine: past
+* Docker: past
 
-- History: Dotcloud's Docker project started in ~ early 2013
-- TODO
+- History: dotCloud's Docker project started in ~ early 2013
+- dotCloud has been around ~8 years; struck a chord with Docker
 
-* Docker Engine: present
+* Docker: past
 
-- libcontainer: native golang container library impl
-- TODO
+- `docker/docker` repo, v0.1.0: https://github.com/docker/docker/releases/tag/v0.1.0
+- March 23, 2013
+- 527 commits
+- dotCloud -> Docker
+- LXC (Linux Containers)
 
-* Docker Engine: future
+* Docker: past
 
-- TODO
+- `docker/docker` repo, v0.9.0: https://github.com/docker/docker/releases/tag/v0.9.0
+- March 10, 2014
+- "Add the pure Go libcontainer library to make it possible to run containers..."
+- "Add native exec driver which uses libcontainer and make it the default exec driver."
+- LXC -> libcontainer
+
+* Docker: present
+
+- 500,000,000 containers downloaded (according to Dockercon)
+- Many products: Engine, Compose, Swarm, Machine, etc.
+- Plugins are powerful
+- OCP! (more later)
+
+* Docker: future
+
+- Microkernels (just kidding)
+- Heavy focus on trust around containers (big criticism)
+- Support more platforms (Microsoft is behind them a lot)
 
 * appc
 
 * appc: origins
 
-- CoreOS started appc project to define a spec
-- CoreOS: heavily invested in Docker, but weren't always aligned (TODO: evidence?)
+- CoreOS started appc project to define a spec for containers
+- Trust at the core; use common tools like pgp/tar/shasum for image verification/portability
+- Independent from CoreOS, maintained by 6 people (up until recently!)
+
+* appc: tenets
+
+- Composable
+- Secure
+- Decentralized (big!)
+- Open
+
+* appc: pieces
+
+- App Container Image: what image is run
+- App Container Image Discovery: how to find images
+- App Container Pod: what a deployable, executable unit is
+- App Container Executor: how pods are executed
 
 * appc + Apcera: Kurma
 
-- Apcera question: hitch our wagon to who?
+- Apcera question: what to do with container runtimes?
+- libcontainer vs rkt vs our own tech vs something else...
+- Spec was attractive; well-defined interface
 
-* Future: OCP
+* Future: Open Container Project
+
+* OCP
+
+- Reference impl: https://github.com/opencontainers/runc
+- Heavily libcontainer flavored
+- No image spec yet (adopting from appc?)
+- Highly in flux! (just over a day old, publicly)
 
 * OCP + Apcera: ?
 
-- Replace internal packaging w/ OCP format for images?
-- Contribute to OCP (thanks Ken!)
+- Committed to improving the spec, with our own impl
+- Providing feedback
+- Very interested in image verification (notary is cool, but independent)
+- Doesn't replace Docker; Docker has the distribution down
