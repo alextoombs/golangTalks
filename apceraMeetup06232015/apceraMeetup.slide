@@ -1,0 +1,77 @@
+Docker + App Container -> OCP
+
+23 June 2015
+
+Alex Toombs
+Software Engineer, Apcera
+alex@apcera.com
+@alextoombs
+See you at Gophercon!
+
+* Who am I?
+
+- @ Apcera > 2 years
+- Platform Lead
+- Deployment, packaging, auditability
+- Not only microservice-based apps: legacy stacks, too
+- (...but not the focus today)
+
+* About Apcera
+
+- Develop a platform for enterprises to manage applications & services
+- Golang users! (>90% Go code in our main repo, since ~ August 2012)
+- Wrote our own container implementation (using common techs like cgroups, namespaces)
+- Digest Docker/ACI/whatever images to run (polyglot)
+
+.image apceraLogo.png _ 1000
+
+* Docker vs CoreOS
+
+* Docker vs CoreOS
+
+// TODO: insert olive branch picture from shykes' talk
+.image oliveBranch.png _ 1000
+
+Just kidding!
+
+* Original title: killed by shykes!
+
+- Awesome announcement yesterday: OCP!
+- Open Container Project (under the Linux Foundation)
+- First reference impl: runC
+- Apcera's down with OCP!
+- Best of libcontainer, appc, etc.
+
+* Docker
+
+* Docker Engine: past
+
+- History: Dotcloud's Docker project started in ~ early 2013
+- TODO
+
+* Docker Engine: present
+
+- libcontainer: native golang container library impl
+- TODO
+
+* Docker Engine: future
+
+- TODO
+
+* appc
+
+* appc: origins
+
+- CoreOS started appc project to define a spec
+- CoreOS: heavily invested in Docker, but weren't always aligned (TODO: evidence?)
+
+* appc + Apcera: Kurma
+
+- Apcera question: hitch our wagon to who?
+
+* Future: OCP
+
+* OCP + Apcera: ?
+
+- Replace internal packaging w/ OCP format for images?
+- Contribute to OCP (thanks Ken!)
